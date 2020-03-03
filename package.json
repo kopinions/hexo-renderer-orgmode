@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/sjkyspa/hexo-renderer-orgmode#readme",
   "dependencies": {
+    "bluebird": "^3.7.2",
     "cheerio": "^1.0.0-rc.3",
     "moment": "^2.24.0",
     "retry": "^0.12.0",

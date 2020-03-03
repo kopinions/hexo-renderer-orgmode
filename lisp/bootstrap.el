@@ -18,8 +18,34 @@
           ((string-prefix-p "gnu" os) 'linux)
           ((or (string-prefix-p "ms" os) (string-prefix-p "windows" os)) 'windows))))
 
-
 (setq gc-cons-threshold 100000000)
+
+(setq org-confirm-babel-evaluate nil)
+(setq make-backup-files nil)
+  ; stop to create the lock files
+  ; lock files is used to prevent concurrent edit of a file
+(setq create-lockfiles nil)
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((R . t)
+   (dot . t)
+   (ditaa . t)
+   (dot . t)
+   (emacs-lisp . t)
+   (gnuplot . t)
+   (haskell . nil)
+   (latex . t)
+   (ledger . t)
+   (ocaml . nil)
+   (octave . t)
+   (plantuml . t)
+   (python . t)
+   (ruby . t)
+   (screen . nil)
+   (shell . t)
+   (sql . t)
+   (sqlite . t)))
 
 (defvar m/root (file-name-directory (or load-file-name (buffer-file-name))))
 
@@ -92,6 +118,10 @@
   "YOU SHOULD NOT SETUP THIS VARIABLE.
 This variable is keeped incase org-hexo not loaded.")
 
+(use-package exec-path-from-shell
+  :config
+  (when (memq m/os '(macos linux))
+    (exec-path-from-shell-initialize)))
 
 (use-package org
   :ensure org-plus-contrib)
@@ -152,12 +182,17 @@ ARGS:
   (let ((file         (or (plist-get args :file)             ""))
         (output-file  (or (plist-get args :output-file)      "")))
     ;; Export file content by ox-hexo.el
+    (find-file file)
+    (org-babel-execute-buffer)
+    (save-buffer)
+    (kill-buffer)
     (with-temp-buffer
       (insert-file-contents file)
       (hexo-renderer-org-insert-options hexo-renderer-org-common-block)
       (org-hexo-export-as-html)
       (write-region (point-min) (point-max) output-file)
       (kill-buffer))))
+
 
 ;; Emacs is Ready!!!
 (message "Emacs is READY!!!!!")
