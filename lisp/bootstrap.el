@@ -123,6 +123,14 @@ This variable is keeped incase org-hexo not loaded.")
   (when (memq m/os '(macos linux))
     (exec-path-from-shell-initialize)))
 
+(use-package cnfonts
+  :ensure t
+  :if (display-graphic-p)
+  :init (setq cnfonts-verbose nil)
+  :config
+  (setq cnfonts-use-face-font-rescale t)
+  (cnfonts-enable))
+
 (use-package org
   :ensure org-plus-contrib)
 (use-package ox-html
