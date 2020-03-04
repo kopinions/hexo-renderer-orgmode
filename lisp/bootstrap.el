@@ -25,6 +25,10 @@
   ; stop to create the lock files
   ; lock files is used to prevent concurrent edit of a file
 (setq create-lockfiles nil)
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
 
 (org-babel-do-load-languages
  'org-babel-load-languages
