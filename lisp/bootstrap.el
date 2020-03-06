@@ -137,6 +137,31 @@ This variable is keeped incase org-hexo not loaded.")
 
 (use-package org
   :ensure org-plus-contrib)
+
+(use-package ob-ditaa
+  :after org
+  :ensure nil
+  :init
+  (unless (and (boundp 'org-ditaa-jar-path)
+	       (file-exists-p org-ditaa-jar-path))
+    (let ((jar-name "ditaa.jar")
+	  (url "https://github.com/stathissideris/ditaa/releases/download/v0.11.0/ditaa-0.11.0-standalone.jar"))
+      (setq org-ditaa-jar-path (expand-file-name jar-name m/conf.d))
+      (unless (file-exists-p org-ditaa-jar-path)
+	(url-copy-file url org-ditaa-jar-path)))))
+
+(use-package ob-plantuml
+  :after org
+  :ensure nil
+  :init
+  (unless (and (boundp 'org-plantuml-jar-path)
+	       (file-exists-p org-plantuml-jar-path))
+    (let ((jar-name "plantuml.jar")
+	  (url "https://downloads.sourceforge.net/project/plantuml/1.2020.2/plantuml.1.2020.2.jar"))
+      (setq org-plantuml-jar-path (expand-file-name jar-name m/conf.d))
+      (unless (file-exists-p org-plantuml-jar-path)
+	(url-copy-file url org-plantuml-jar-path)))))
+
 (use-package ox-html
   :ensure nil)
 (use-package htmlize
