@@ -216,19 +216,20 @@ ARGS:
  :file         \"File path to render\"
  :output-file  \"Output file which redner by org-hexo\"
  )"
-  (let ((file         (or (plist-get args :file)             ""))
-        (output-file  (or (plist-get args :output-file)      "")))
-    ;; Export file content by ox-hexo.el
-    (find-file file)
-    (org-babel-execute-buffer)
-    (save-buffer)
-    (kill-buffer)
-    (with-temp-buffer
-      (insert-file-contents file)
-      (hexo-renderer-org-insert-options hexo-renderer-org-common-block)
-      (org-hexo-export-as-html)
-      (write-region (point-min) (point-max) output-file)
-      (kill-buffer))))
+  (let* ((file         (or (plist-get args :file)             ""))
+	 (output-file  (or (plist-get args :output-file)      ""))
+	 (exebuf (find-file-noselect file)))
+    (with-current-buffer exebuf
+      (org-babel-execute-buffer)
+      (with-temp-buffer
+	(insert-buffer-substring exebuf)
+	(hexo-renderer-org-insert-options hexo-renderer-org-common-block)
+	(org-hexo-export-as-html)
+	(write-region (point-min) (point-max) output-file)
+	(kill-buffer))
+      (set-buffer-modified-p nil)
+      (kill-buffer exebuf)
+      )))
 
 
 ;; Emacs is Ready!!!
