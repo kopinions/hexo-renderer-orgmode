@@ -18,6 +18,9 @@
           ((string-prefix-p "gnu" os) 'linux)
           ((or (string-prefix-p "ms" os) (string-prefix-p "windows" os)) 'windows))))
 
+(defconst m/root (file-name-directory (or load-file-name (buffer-file-name))))
+(defconst m/conf.d m/root)
+
 (setq gc-cons-threshold 100000000)
 
 (setq org-confirm-babel-evaluate nil)
@@ -51,7 +54,6 @@
    (sql . t)
    (sqlite . t)))
 
-(defvar m/root (file-name-directory (or load-file-name (buffer-file-name))))
 
 (require 'package)
 ;;; Install into separate package dirs for each Emacs version, to prevent bytecode incompatibility
