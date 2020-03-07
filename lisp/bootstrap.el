@@ -68,13 +68,15 @@
       (setq package-archives '(("gnu"   . "https://elpa.emacs-china.org/gnu/")
 			       ("melpa" . "https://elpa.emacs-china.org/melpa/")
 			       ("org" . "https://elpa.emacs-china.org/org/"))))))
-
 (setq load-prefer-newer t)
 (package-initialize)
+(unless (package-installed-p 'auto-compile)
+  (package-refresh-contents)
+  (package-install 'auto-compile))
+
 (require 'auto-compile)
 (auto-compile-on-load-mode)
 (auto-compile-on-save-mode)
-(package-refresh-contents)
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
