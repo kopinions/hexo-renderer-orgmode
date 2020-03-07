@@ -17,9 +17,6 @@
 (defvar hexo-renderer-org-debug nil
   "Enable debug message or not.")
 
-(defvar hexo-renderer-org-htmlize "false"
-  "Enable use Emacs's htmlize package to renderer code block or not.")
-
 (setq user-emacs-directory (concat (file-name-as-directory ".cache") "emacs.d")) 
 
 (defconst m/os
@@ -98,6 +95,21 @@
 (use-package org
   :ensure org-plus-contrib
   :config
+  (unless (and (boundp 'org-ditaa-jar-path)
+	       (file-exists-p org-ditaa-jar-path))
+    (let ((jar-name "ditaa.jar")
+	  (url "https://github.com/stathissideris/ditaa/releases/download/v0.11.0/ditaa-0.11.0-standalone.jar"))
+      (setq org-ditaa-jar-path (expand-file-name jar-name m/cache.d))
+      (unless (file-exists-p org-ditaa-jar-path)
+	(url-copy-file url org-ditaa-jar-path))))
+
+  (unless (and (boundp 'org-plantuml-jar-path)
+	       (file-exists-p org-plantuml-jar-path))
+    (let ((jar-name "plantuml.jar")
+	  (url "https://downloads.sourceforge.net/project/plantuml/1.2020.2/plantuml.1.2020.2.jar"))
+      (setq org-plantuml-jar-path (expand-file-name jar-name m/cache.d))
+      (unless (file-exists-p org-plantuml-jar-path)
+	(url-copy-file url org-plantuml-jar-path))))
   ;; Allow use #+BIND: in org-mode
   (setq org-confirm-babel-evaluate nil)
   (org-babel-do-load-languages
@@ -120,34 +132,6 @@
      (sql . t)
      (sqlite . t))))
 
-(use-package ob-ditaa
-  :after org
-  :ensure nil
-  :init
-  (unless (and (boundp 'org-ditaa-jar-path)
-	       (file-exists-p org-ditaa-jar-path))
-    (let ((jar-name "ditaa.jar")
-	  (url "https://github.com/stathissideris/ditaa/releases/download/v0.11.0/ditaa-0.11.0-standalone.jar"))
-      (setq org-ditaa-jar-path (expand-file-name jar-name m/cache.d))
-      (unless (file-exists-p org-ditaa-jar-path)
-	(url-copy-file url org-ditaa-jar-path)))))
-
-(use-package ob-plantuml
-  :after org
-  :ensure nil
-  :init
-  (unless (and (boundp 'org-plantuml-jar-path)
-	       (file-exists-p org-plantuml-jar-path))
-    (let ((jar-name "plantuml.jar")
-	  (url "https://downloads.sourceforge.net/project/plantuml/1.2020.2/plantuml.1.2020.2.jar"))
-      (setq org-plantuml-jar-path (expand-file-name jar-name m/cache.d))
-      (unless (file-exists-p org-plantuml-jar-path)
-	(url-copy-file url org-plantuml-jar-path)))))
-
-(use-package ox-html
-  :ensure nil)
-(use-package htmlize
-  :if hexo-renderer-org--use-htmlize)
 (use-package ox-hexo
   :load-path m/root
   :commands (org-hexo-export-as-html))
@@ -156,8 +140,8 @@
 
 (defun hexo-org-renderer-oops (msg)
   "OOPS: something error, let's show the MSG and kill EMACS :(."
-    (princ msg)
-    (kill-emacs))
+  (princ msg)
+  (kill-emacs))
 
 ;; The emacs daemon SHOULD die when error occurs.
 (run-with-idle-timer
@@ -203,8 +187,7 @@ ARGS:
 	(write-region (point-min) (point-max) output-file)
 	(kill-buffer))
       (set-buffer-modified-p nil)
-      (kill-buffer exebuf)
-      )))
+      (kill-buffer exebuf))))
 
 
 ;; Emacs is Ready!!!
