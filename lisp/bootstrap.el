@@ -101,6 +101,8 @@
 
 (use-package org
   :ensure org-plus-contrib
+  :custom
+  (org-export-allow-bind-keywords t)
   :config
   (unless (and (boundp 'org-ditaa-jar-path)
 	       (file-exists-p org-ditaa-jar-path))
