@@ -16,6 +16,8 @@
 (defvar org-hexo-use-line-number nil
   "Set t to add line-number to all src-block.")
 
+(defvar org-hexo-export-src-file nil)
+
 (defvar org-hexo-use-line-number-on-example-block nil
   "Set t to add line-number to all example-block.
 If you want to make example-block has line-number, you also need to setup `org-hexo-use-line-number' to t.")
@@ -69,12 +71,68 @@ If you want to make example-block has line-number, you also need to setup `org-h
     (paragraph . org-hexo-html-paragraph)
     ;; convert relative link to let pelican can recognize
     (link . org-hexo-html-link)
+    (latex-fragment . org-hexo-latex-fragment)
     ;; For line-number and highlight.js support
     (src-block . org-hexo-src-block)
     (example-block . org-hexo-example-block)
     ;; Remove unuse html in template
     (template . org-hexo-template)
     ))
+
+(defun org-hexo-latex-fragment (latex-fragment contents info)
+  "Transcode a LATEX-FRAGMENT object from Org to HTML.
+CONTENTS is nil.  INFO is a plist holding contextual information."
+  (let ((latex-frag (org-element-property :value latex-fragment))
+	(processing-type (plist-get info :with-latex)))
+    (cond
+     ((memq processing-type '(t mathjax))
+      (org-hexo-format-latex latex-frag 'mathjax info))
+     ((assq processing-type org-preview-latex-process-alist)
+      (let ((formula-link
+	     (org-hexo-format-latex latex-frag processing-type info)))
+	(message formula-link)
+	(when (and formula-link (string-match "file:\\([^]]*\\)" formula-link))
+	  (org-html--format-image (match-string 1 formula-link) nil info))))
+     (t latex-frag))))
+
+(defun org-hexo-format-latex (latex-frag processing-type info)
+  "Format a LaTeX fragment LATEX-FRAG into HTML.
+PROCESSING-TYPE designates the tool used for conversion.  It can
+be `mathjax', `verbatim', nil, t or symbols in
+`org-preview-latex-process-alist', e.g., `dvipng', `dvisvgm' or
+`imagemagick'.  See `org-html-with-latex' for more information.
+INFO is a plist containing export properties."
+  (let ((cache-relpath "") (cache-dir ""))
+    (unless (eq processing-type 'mathjax)
+      (let ((bfn (or org-hexo-export-src-file
+		  (buffer-file-name)
+		     (make-temp-name
+		      (expand-file-name "latex" temporary-file-directory))))
+	    (latex-header
+	     (let ((header (plist-get info :latex-header)))
+	       (and header
+		    (concat (mapconcat
+			     (lambda (line) (concat "#+LATEX_HEADER: " line))
+			     (org-split-string header "\n")
+			     "\n")
+			    "\n")))))
+	(setq cache-relpath
+	      (concat (file-name-as-directory org-preview-latex-image-directory)
+		      (file-name-sans-extension
+		       (file-name-nondirectory bfn)))
+	      cache-dir (file-name-directory bfn))
+	;; Re-create LaTeX environment from original buffer in
+	;; temporary buffer so that dvipng/imagemagick can properly
+	;; turn the fragment into an image.
+	(setq latex-frag (concat latex-header latex-frag))))
+    (with-temp-buffer
+      (insert latex-frag)
+      (message cache-relpath)
+      (message (concat "cache-directory" cache-dir))
+      (message org-hexo-export-src-file)
+      (org-format-latex cache-relpath nil nil cache-dir nil
+			"Creating LaTeX Image..." nil processing-type)
+      (buffer-string))))
 
 ;;;; Paragraph
 

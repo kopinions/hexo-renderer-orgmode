@@ -102,7 +102,11 @@
 (use-package org
   :ensure org-plus-contrib
   :custom
+  (org-src-fontify-natively t)
   (org-export-allow-bind-keywords t)
+  (org-use-sub-superscripts '{})
+  (org-export-with-sub-superscripts '{})
+  (org-export-coding-system 'utf-8)
   :config
   (unless (and (boundp 'org-ditaa-jar-path)
 	       (file-exists-p org-ditaa-jar-path))
@@ -191,6 +195,7 @@ ARGS:
       (org-babel-execute-buffer)
       (with-temp-buffer
 	(insert-buffer-substring exebuf)
+	(setq org-hexo-export-src-file (buffer-file-name exebuf))
 	(hexo-renderer-org-insert-options hexo-renderer-org-common-block)
 	(org-hexo-export-as-html)
 	(write-region (point-min) (point-max) output-file)
