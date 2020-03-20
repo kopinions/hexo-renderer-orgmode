@@ -192,6 +192,7 @@ ARGS:
 	 (output-file  (or (plist-get args :output-file)      ""))
 	 (exebuf (find-file-noselect file)))
     (with-current-buffer exebuf
+      (ignore-errors (make-directory (expand-file-name (file-name-base (buffer-file-name exebuf)) (file-name-directory (buffer-file-name exebuf)))))
       (org-babel-execute-buffer)
       (with-temp-buffer
 	(insert-buffer-substring exebuf)
