@@ -14,7 +14,7 @@
 (defvar hexo-renderer-org-common-block "#+OPTIONS: html-postamble:nil num:nil toc:nil ^:nil"
   "Common `org-mode' settings in string, like #+OPTIONS: html-postamble:nil num:nil toc:nil ^:nil .")
 
-(defvar hexo-renderer-org-debug nil
+(defvar hexo-renderer-org-debug t
   "Enable debug message or not.")
 
 (setq user-emacs-directory (concat (file-name-as-directory ".cache") "emacs.d")) 
