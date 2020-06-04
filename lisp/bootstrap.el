@@ -71,7 +71,7 @@
 	 (proto (if no-ssl "http" "https")))
     (message "remote")
     (setq package-archives `(("gnu"   . ,(concat proto "://elpa.gnu.org/packages/"))
-			     ("melpa" . ,(concat proto "://melpa.org/packages//melpa/"))
+			     ("melpa" . ,(concat proto "://melpa.org/packages/"))
 			     ("org" . ,(concat proto "://orgmode.org/elpa/"))))))
 
 (setq load-prefer-newer t)
