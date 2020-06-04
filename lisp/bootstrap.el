@@ -17,6 +17,8 @@
 (defvar hexo-renderer-org-debug t
   "Enable debug message or not.")
 
+(defvar hexo-renderer-org-emacs-packages-cache "")
+
 (setq user-emacs-directory (concat (file-name-as-directory ".cache") "emacs.d")) 
 
 (defconst m/os
@@ -27,6 +29,9 @@
 
 (defconst m/root (file-name-directory (or load-file-name (buffer-file-name))))
 (add-to-list 'load-path user-emacs-directory)
+
+(defvar m/offline 
+  (file-directory-p hexo-renderer-org-emacs-packages-cache))
 
 (defconst m/cache.d (file-name-as-directory ".cache"))
 
@@ -56,18 +61,20 @@
                          user-emacs-directory)))
   (setq package-user-dir versioned-package-dir))
 
+(if m/offline
+    (setq package-archives `(("gnu" . ,(expand-file-name "gnu" hexo-renderer-org-emacs-packages-cache))
+			     ("melpa" . ,(expand-file-name "melpa" hexo-renderer-org-emacs-packages-cache))
+			     ("org" . ,(expand-file-name "org" hexo-renderer-org-emacs-packages-cache))))
+  (let* ((no-ssl (and (memq system-type '(windows-nt m11s-dos))
+		      (not (gnutls-available-p))))
+	 (proto (if no-ssl "http" "https")))
+    (setq package-archives '(("gnu"   . (concat proto "://elpa.gnu.org/packages/"))
+			     ("melpa" . (concat proto "://melpa.org/packages//melpa/"))
+			     ("org" . (concat proto "://orgmode.org/elpa/"))))))
 
-(let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
-		    (not (gnutls-available-p))))
-       (proto (if no-ssl "http" "https")))
-  (if no-ssl
-      (setq package-archives '(("gnu"   . "http://elpa.emacs-china.org/gnu/")
-			       ("melpa" . "http://elpa.emacs-china.org/melpa/")
-			       ("org" . "http://elpa.emacs-china.org/org/")))
-    (unless no-ssl
-      (setq package-archives '(("gnu"   . "https://elpa.emacs-china.org/gnu/")
-			       ("melpa" . "https://elpa.emacs-china.org/melpa/")
-			       ("org" . "https://elpa.emacs-china.org/org/"))))))
+
+
+
 (setq load-prefer-newer t)
 (package-initialize)
 (unless (package-installed-p 'auto-compile)
