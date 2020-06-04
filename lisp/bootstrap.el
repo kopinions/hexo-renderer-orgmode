@@ -31,7 +31,9 @@
 (add-to-list 'load-path user-emacs-directory)
 
 (defvar m/offline 
-  (file-directory-p hexo-renderer-org-emacs-packages-cache))
+  (and (not (string= "" hexo-renderer-org-emacs-packages-cache))
+       (file-exists-p hexo-renderer-org-emacs-packages-cache)
+       (file-directory-p hexo-renderer-org-emacs-packages-cache)))
 
 (defconst m/cache.d (file-name-as-directory ".cache"))
 
@@ -60,7 +62,6 @@
        (expand-file-name (format "elpa-%s.%s" emacs-major-version emacs-minor-version)
                          user-emacs-directory)))
   (setq package-user-dir versioned-package-dir))
-
 (if m/offline
     (setq package-archives `(("gnu" . ,(expand-file-name "gnu" hexo-renderer-org-emacs-packages-cache))
 			     ("melpa" . ,(expand-file-name "melpa" hexo-renderer-org-emacs-packages-cache))
@@ -68,12 +69,10 @@
   (let* ((no-ssl (and (memq system-type '(windows-nt m11s-dos))
 		      (not (gnutls-available-p))))
 	 (proto (if no-ssl "http" "https")))
-    (setq package-archives '(("gnu"   . (concat proto "://elpa.gnu.org/packages/"))
-			     ("melpa" . (concat proto "://melpa.org/packages//melpa/"))
-			     ("org" . (concat proto "://orgmode.org/elpa/"))))))
-
-
-
+    (message "remote")
+    (setq package-archives `(("gnu"   . ,(concat proto "://elpa.gnu.org/packages/"))
+			     ("melpa" . ,(concat proto "://melpa.org/packages//melpa/"))
+			     ("org" . ,(concat proto "://orgmode.org/elpa/"))))))
 
 (setq load-prefer-newer t)
 (package-initialize)
