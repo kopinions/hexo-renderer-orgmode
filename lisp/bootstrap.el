@@ -17,9 +17,7 @@
 (defvar hexo-renderer-org-debug t
   "Enable debug message or not.")
 
-(defvar hexo-renderer-org-emacs-packages-cache "")
-
-(setq user-emacs-directory (concat (file-name-as-directory ".cache") "emacs.d")) 
+(defvar hexo-renderer-org-emacs-offline "")
 
 (defconst m/os
   (let ((os (symbol-name system-type)))
@@ -27,15 +25,24 @@
           ((string-prefix-p "gnu" os) 'linux)
           ((or (string-prefix-p "ms" os) (string-prefix-p "windows" os)) 'windows))))
 
+(setq debug-on-error t)
+
 (defconst m/root (file-name-directory (or load-file-name (buffer-file-name))))
+
+(defvar m/offline
+  (and (not (string= "" hexo-renderer-org-emacs-offline))
+       (file-exists-p hexo-renderer-org-emacs-offline)
+       (file-directory-p hexo-renderer-org-emacs-offline)))
+
+(defconst m/cache.d
+  (cond ((and (not (string= "" hexo-renderer-org-cachedir))
+	      (file-exists-p hexo-renderer-org-cachedir)
+	      (file-directory-p hexo-renderer-org-cachedir)) hexo-renderer-org-cachedir)
+	(t (expand-file-name "cache" m/root))))
+
+(setq user-emacs-directory (expand-file-name "emacs.d" m/cache.d))
+
 (add-to-list 'load-path user-emacs-directory)
-
-(defvar m/offline 
-  (and (not (string= "" hexo-renderer-org-emacs-packages-cache))
-       (file-exists-p hexo-renderer-org-emacs-packages-cache)
-       (file-directory-p hexo-renderer-org-emacs-packages-cache)))
-
-(defconst m/cache.d (file-name-as-directory ".cache"))
 
 (unless hexo-renderer-org-debug
   (setq inhibit-message t))
@@ -63,9 +70,9 @@
                          user-emacs-directory)))
   (setq package-user-dir versioned-package-dir))
 (if m/offline
-    (setq package-archives `(("gnu" . ,(expand-file-name "gnu" hexo-renderer-org-emacs-packages-cache))
-			     ("melpa" . ,(expand-file-name "melpa" hexo-renderer-org-emacs-packages-cache))
-			     ("org" . ,(expand-file-name "org" hexo-renderer-org-emacs-packages-cache))))
+    (setq package-archives `(("gnu" . ,(expand-file-name "gnu" hexo-renderer-org-emacs-offline))
+			     ("melpa" . ,(expand-file-name "melpa" hexo-renderer-org-emacs-offline))
+			     ("org" . ,(expand-file-name "org" hexo-renderer-org-emacs-offline))))
   (let* ((no-ssl (and (memq system-type '(windows-nt m11s-dos))
 		      (not (gnutls-available-p))))
 	 (proto (if no-ssl "http" "https")))

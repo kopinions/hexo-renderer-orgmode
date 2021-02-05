@@ -128,7 +128,8 @@ INFO is a plist containing export properties."
     (with-temp-buffer
       (insert latex-frag)
       (message cache-relpath)
-      (message (concat "cache-directory" cache-dir))
+      (message bfn)
+      (message (concat "cache-directory:" cache-dir))
       (message org-hexo-export-src-file)
       (org-format-latex cache-relpath nil nil cache-dir nil
 			"Creating LaTeX Image..." nil processing-type)
@@ -179,7 +180,10 @@ a communication channel."
          (raw-link (org-element-property :path link))
          (raw-path (expand-file-name raw-link))
          (html-link (org-html-link link contents info)))
-
+    (message html-link)
+    (message contents)
+    (message link)
+    (message info)
     ;; file
     (when (string= type "file")
       ;; Fix file link if prefix with org-mode file name.
