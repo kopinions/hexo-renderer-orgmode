@@ -26,7 +26,7 @@ hexo.on('exit', function(err) {
     }
 });
 
-hexo.extend.filter.register('before_post_render', filter);
+hexo.extend.filter.register('before_post_render', filter(hexo));
 hexo.extend.renderer.register('org', 'html', renderer.bind(hexo), false);
 const {pattern, process} = require('./lib/processor')(hexo)
 hexo.extend.processor.register(pattern, process);
