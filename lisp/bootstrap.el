@@ -5,7 +5,21 @@
 ;;; Code:
 
 ;;;; Public variables
-(defvar hexo-renderer-org-cachedir "./.cache"
+(setq load-path
+      (delq nil (mapcar
+                 (function (lambda (p)
+                             (unless (string-match "lisp\\(/packages\\)?/org$" p)
+                               p)))
+                 load-path)))
+;; remove property list to defeat cus-load and remove autoloads
+(mapatoms (function  (lambda (s)
+                       (let ((sn (symbol-name s)))
+                         (when (string-match "^\\(org\\|ob\\|ox\\)\\(-.*\\)?$" sn)
+                           (setplist s nil)
+                           (when (eq 'autoload (car-safe s))
+                             (unintern s)))))))
+
+(defvar hexo-renderer-org-cachedir "/Volumes/data/workspace/1si/pututu/.cache"
   "Cache directory to save generated result and Emacs packages to increase startup speed.")
 
 (defvar hexo-renderer-org-theme ""
@@ -17,14 +31,16 @@
 (defvar hexo-renderer-org-debug t
   "Enable debug message or not.")
 
-(defvar hexo-renderer-org-emacs-offline "")
+(defvar hexo-renderer-org-emacs-offline "/Volumes/data/workspace/disposables/mirrors/emacs")
 
 (defconst m/os
   (let ((os (symbol-name system-type)))
     (cond ((string= os "darwin") 'macos)
           ((string-prefix-p "gnu" os) 'linux)
           ((or (string-prefix-p "ms" os) (string-prefix-p "windows" os)) 'windows))))
-
+(when (eq m/os 'macos)
+  (setq mac-command-modifier 'meta)
+  (setq mac-option-modifier 'super))
 (setq debug-on-error t)
 
 (defconst m/root (file-name-directory (or load-file-name (buffer-file-name))))
@@ -38,7 +54,7 @@
   (cond ((and (not (string= "" hexo-renderer-org-cachedir))
 	      (file-exists-p hexo-renderer-org-cachedir)
 	      (file-directory-p hexo-renderer-org-cachedir)) hexo-renderer-org-cachedir)
-	(t (expand-file-name "cache" m/root))))
+	(t (expand-file-name ".cache" m/root))))
 
 (setq user-emacs-directory (expand-file-name "emacs.d" m/cache.d))
 
@@ -46,6 +62,7 @@
 
 (unless hexo-renderer-org-debug
   (setq inhibit-message t))
+
 (setq gc-cons-threshold 100000000)
 ;; Ignore all directory-local variables in `.dir-locals.el', whick make Emacs stucks there.
 (setq enable-dir-local-variables nil)
@@ -69,6 +86,7 @@
        (expand-file-name (format "elpa-%s.%s" emacs-major-version emacs-minor-version)
                          user-emacs-directory)))
   (setq package-user-dir versioned-package-dir))
+
 (if m/offline
     (setq package-archives `(("gnu" . ,(expand-file-name "gnu" hexo-renderer-org-emacs-offline))
 			     ("melpa" . ,(expand-file-name "melpa" hexo-renderer-org-emacs-offline))
@@ -83,6 +101,9 @@
 
 (setq load-prefer-newer t)
 (package-initialize)
+(assq-delete-all 'org package--builtins)
+(assq-delete-all 'org package--builtin-versions)
+
 (unless (package-installed-p 'auto-compile)
   (package-refresh-contents)
   (package-install 'auto-compile))
@@ -113,7 +134,7 @@
   (cnfonts-enable))
 
 (use-package org
-  :ensure org-plus-contrib
+  :pin gnu
   :custom
   (org-src-fontify-natively t)
   (org-export-allow-bind-keywords t)
