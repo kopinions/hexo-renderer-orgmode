@@ -19,7 +19,7 @@
                            (when (eq 'autoload (car-safe s))
                              (unintern s)))))))
 
-(defvar hexo-renderer-org-cachedir "/Volumes/data/workspace/1si/pututu/.cache"
+(defvar hexo-renderer-org-cachedir ".cache.d"
   "Cache directory to save generated result and Emacs packages to increase startup speed.")
 
 (defvar hexo-renderer-org-theme ""
@@ -31,7 +31,7 @@
 (defvar hexo-renderer-org-debug t
   "Enable debug message or not.")
 
-(defvar hexo-renderer-org-emacs-offline "/Volumes/data/workspace/disposables/mirrors/emacs")
+(defvar hexo-renderer-org-emacs-offlinedir ".offline.d")
 
 (defconst m/os
   (let ((os (symbol-name system-type)))
@@ -46,15 +46,16 @@
 (defconst m/root (file-name-directory (or load-file-name (buffer-file-name))))
 
 (defvar m/offline
-  (and (not (string= "" hexo-renderer-org-emacs-offline))
-       (file-exists-p hexo-renderer-org-emacs-offline)
-       (file-directory-p hexo-renderer-org-emacs-offline)))
+  (and (not (string= "" hexo-renderer-org-emacs-offlinedir))
+       (file-exists-p hexo-renderer-org-emacs-offlinedir)
+       (file-directory-p hexo-renderer-org-emacs-offlinedir)))
 
 (defconst m/cache.d
-  (cond ((and (not (string= "" hexo-renderer-org-cachedir))
-	      (file-exists-p hexo-renderer-org-cachedir)
-	      (file-directory-p hexo-renderer-org-cachedir)) hexo-renderer-org-cachedir)
-	(t (expand-file-name ".cache" m/root))))
+  (let ((cachedir (cond ((and (not (string= "" hexo-renderer-org-cachedir))
+			      (file-name-absolute-p  hexo-renderer-org-cachedir)) hexo-renderer-org-cachedir)
+			(t (expand-file-name ".cache.d" m/root)))))
+    (cond ((not (file-directory-p cachedir)) (make-directory cachedir))
+	  (t cachedir))))
 
 (setq user-emacs-directory (expand-file-name "emacs.d" m/cache.d))
 
@@ -88,9 +89,9 @@
   (setq package-user-dir versioned-package-dir))
 
 (if m/offline
-    (setq package-archives `(("gnu" . ,(expand-file-name "gnu" hexo-renderer-org-emacs-offline))
-			     ("melpa" . ,(expand-file-name "melpa" hexo-renderer-org-emacs-offline))
-			     ("org" . ,(expand-file-name "org" hexo-renderer-org-emacs-offline))))
+    (setq package-archives `(("gnu" . ,(expand-file-name "gnu" hexo-renderer-org-emacs-offlinedir))
+			     ("melpa" . ,(expand-file-name "melpa" hexo-renderer-org-emacs-offlinedir))
+			     ("org" . ,(expand-file-name "org" hexo-renderer-org-emacs-offlinedir))))
   (let* ((no-ssl (and (memq system-type '(windows-nt m11s-dos))
 		      (not (gnutls-available-p))))
 	 (proto (if no-ssl "http" "https")))
