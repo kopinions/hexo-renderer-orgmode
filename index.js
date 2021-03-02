@@ -1,6 +1,6 @@
 'use strict';
 var renderer = require('./lib/renderer');
-const {server} = require('./lib/emacs.js')
+const {server} = require('./lib/emacs')
 var {filter} = require('./lib/transformer');
 const emacsed = () => {
     const process = require('process')
