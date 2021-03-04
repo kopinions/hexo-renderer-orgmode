@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sjkyspa/hexo-renderer-orgmode.git"
+    "url": "git+https://github.com/kopinions/hexo-renderer-orgmode.git"
   },
   "keywords": [
     "hexo",
@@ -21,14 +21,15 @@
   "author": "neo",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/sjkyspa/hexo-renderer-orgmode/issues"
+    "url": "https://github.com/kopinions/hexo-renderer-orgmode/issues"
   },
-  "homepage": "https://github.com/sjkyspa/hexo-renderer-orgmode#readme",
+  "homepage": "https://github.com/kopinions/hexo-renderer-orgmode#readme",
   "dependencies": {
     "bluebird": "^3.7.2",
     "cheerio": "^1.0.0-rc.3",
     "hexo": "^5.3.0",
     "hexo-cli": "^4.2.0",
+    "hexo-util": "^2.4.0",
     "moment": "^2.29.1",
     "retry": "^0.12.0",
     "tmp": "^0.2.1",
