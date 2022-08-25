@@ -19,6 +19,7 @@
                            (when (eq 'autoload (car-safe s))
                              (unintern s)))))))
 
+(setq package-check-signature nil) 
 (defvar hexo-renderer-org-cachedir ".cache.d"
   "Cache directory to save generated result and Emacs packages to increase startup speed.")
 
