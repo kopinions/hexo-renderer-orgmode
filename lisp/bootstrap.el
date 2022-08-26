@@ -5,21 +5,7 @@
 ;;; Code:
 
 ;;;; Public variables
-(setq load-path
-      (delq nil (mapcar
-                 (function (lambda (p)
-                             (unless (string-match "lisp\\(/packages\\)?/org$" p)
-                               p)))
-                 load-path)))
-;; remove property list to defeat cus-load and remove autoloads
-(mapatoms (function  (lambda (s)
-                       (let ((sn (symbol-name s)))
-                         (when (string-match "^\\(org\\|ob\\|ox\\)\\(-.*\\)?$" sn)
-                           (setplist s nil)
-                           (when (eq 'autoload (car-safe s))
-                             (unintern s)))))))
 
-(setq package-check-signature nil) 
 (defvar hexo-renderer-org-cachedir ".cache.d"
   "Cache directory to save generated result and Emacs packages to increase startup speed.")
 
@@ -34,17 +20,9 @@
 
 (defvar hexo-renderer-org-emacs-offlinedir ".offline.d")
 
-(defconst m/os
-  (let ((os (symbol-name system-type)))
-    (cond ((string= os "darwin") 'macos)
-          ((string-prefix-p "gnu" os) 'linux)
-          ((or (string-prefix-p "ms" os) (string-prefix-p "windows" os)) 'windows))))
-(when (eq m/os 'macos)
-  (setq mac-command-modifier 'meta)
-  (setq mac-option-modifier 'super))
 (setq debug-on-error t)
 
-(defconst m/root (file-name-directory (or load-file-name (buffer-file-name))))
+(defconst m/filepath (file-name-directory (or load-file-name (buffer-file-name))))
 
 (defvar m/offline
   (and (not (string= "" hexo-renderer-org-emacs-offlinedir))
@@ -54,7 +32,7 @@
 (defconst m/cache.d
   (let ((cachedir (cond ((and (not (string= "" hexo-renderer-org-cachedir))
 			      (file-name-absolute-p  hexo-renderer-org-cachedir)) hexo-renderer-org-cachedir)
-			(t (expand-file-name ".cache.d" m/root)))))
+			(t (expand-file-name ".cache.d" m/filepath)))))
     (cond ((not (file-directory-p cachedir)) (make-directory cachedir))
 	  (t cachedir))))
 
@@ -111,13 +89,13 @@
   (package-install 'auto-compile))
 
 
-
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
 
 (require 'use-package)
 (setq use-package-always-ensure t)
+
 
 (use-package exec-path-from-shell
   :config
@@ -178,7 +156,7 @@
      (sqlite . t))))
 
 (use-package ox-hexo
-  :load-path m/root
+  :load-path m/filepath
   :commands (org-hexo-export-as-html))
 
 ;;;; Debugger
