@@ -110,9 +110,7 @@
   (package-refresh-contents)
   (package-install 'auto-compile))
 
-(require 'auto-compile)
-(auto-compile-on-load-mode)
-(auto-compile-on-save-mode)
+
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -121,6 +119,12 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
+(use-package auto-compile
+  :ensure t
+  :custom (load-prefer-newer t)
+  :config
+  (auto-compile-on-load-mode)
+  (auto-compile-on-save-mode))
 
 (use-package exec-path-from-shell
   :config
