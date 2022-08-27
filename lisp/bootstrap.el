@@ -24,6 +24,11 @@
 
 (defconst m/filepath (file-name-directory (or load-file-name (buffer-file-name))))
 
+(defconst m/os
+  (let ((os (symbol-name system-type)))
+    (cond ((string= os "darwin") 'macos)
+          ((string-prefix-p "gnu" os) 'linux)
+
 (defvar m/offline
   (and (not (string= "" hexo-renderer-org-emacs-offlinedir))
        (file-exists-p hexo-renderer-org-emacs-offlinedir)
