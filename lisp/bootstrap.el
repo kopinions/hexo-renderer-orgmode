@@ -27,7 +27,7 @@
 (defconst m/os
   (let ((os (symbol-name system-type)))
     (cond ((string= os "darwin") 'macos)
-          ((string-prefix-p "gnu" os) 'linux)
+          ((string-prefix-p "gnu" os) 'linux))))
 
 (defvar m/offline
   (and (not (string= "" hexo-renderer-org-emacs-offlinedir))
